@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Student</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="brand">
+        <div class="brand-icon">🎓</div>
+        <div>
+            <h1>Student Management</h1>
+            <p>School Records Management Portal</p>
+        </div>
+    </div>
+</header>
+
+<nav class="navbar">
+    <a href="index.html">⌂ Home</a>
+    <a href="list.html">☷ List Students</a>
+    <a href="listOne.html" class="active">⌕ Search Student</a>
+    <a href="insert.html">＋ Insert Student</a>
+    <a href="update.html">✎ Update Student</a>
+    <a href="delete.html">▤ Delete Student</a>
+</nav>
+
+<main class="container">
+
+    <div class="page-heading">
+        <h2>🔍 Search Student</h2>
+        <p>Select a student number to view details.</p>
+    </div>
+
+    <img src="images/listone.png"
+         alt="Search Student"
+         class="page-image">
+
+    <section class="panel">
+        <div class="form-group">
+            <label for="sno">Select Student</label>
+            <select id="sno">
+                <option value="">-- Select Student --</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" onclick="searchStudent()">
+                Search Student
+            </button>
+        </div>
+    </section>
+
+    <h3 class="section-title">Search Results</h3>
+
+    <div class="table-panel">
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>Student Number</th>
+                    <th>Student Name</th>
+                    <th>Total Marks</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</main>
+
+<footer class="site-footer">
+    Student Management System | School Database Project
+</footer>
+
+<script>
+loadStudentNumbers();
+
+function loadStudentNumbers() {
+    fetch("/student")
+        .then(response => {
+            if (!response.ok) throw new Error("Unable to load students");
+            return response.json();
+        })
+        .then(data => {
+            const dropdown = document.getElementById("sno");
+
+            data.forEach(student => {
+                const option = document.createElement("option");
+                option.value = student.sno;
+                option.textContent = student.sno + " - " + student.name;
+                dropdown.appendChild(option);
+            });
+        })
+        .catch(error => alert(error.message));
+}
+
+function searchStudent() {
+    const sno = document.getElementById("sno").value;
+
+    if (!sno) {
+        alert("Please select a student");
+        return;
+    }
+
+    fetch("/student/" + encodeURIComponent(sno))
+        .then(response => {
+            if (!response.ok) throw new Error("Unable to find student");
+            return response.json();
+        })
+        .then(data => {
+            const tbody = document.querySelector("#studentTable tbody");
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = "";
+                alert("Student Not Found");
+                return;
+            }
+
+            tbody.innerHTML = `
+                <tr>
+                    <td>${data[0].sno}</td>
+                    <td>${data[0].name}</td>
+                    <td>${data[0].total}</td>
+                </tr>
+            `;
+        })
+        .catch(error => alert(error.message));
+}
+</script>
+
+</body>
+</html>

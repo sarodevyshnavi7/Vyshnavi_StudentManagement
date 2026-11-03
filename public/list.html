@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Students</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="brand">
+        <div class="brand-icon">🎓</div>
+        <div>
+            <h1>Student Management</h1>
+            <p>School Records Management Portal</p>
+        </div>
+    </div>
+</header>
+
+<nav class="navbar">
+    <a href="index.html">⌂ Home</a>
+    <a href="list.html" class="active">☷ List Students</a>
+    <a href="listOne.html">⌕ Search Student</a>
+    <a href="insert.html">＋ Insert Student</a>
+    <a href="update.html">✎ Update Student</a>
+    <a href="delete.html">▤ Delete Student</a>
+</nav>
+
+<main class="container">
+
+    <div class="page-heading">
+        <h2>📋 List of Students</h2>
+        <p>View all student records stored in the database.</p>
+    </div>
+
+    <img src="images/list.jpg"
+         alt="Student Records"
+         class="page-image">
+
+    <div class="table-toolbar">
+        <h3>Student Records</h3>
+        <button class="btn" onclick="loadStudents()">↻ Refresh List</button>
+    </div>
+
+    <div class="table-panel">
+        <table id="studentTable">
+            <thead>
+                <tr>
+                    <th>Student Number</th>
+                    <th>Student Name</th>
+                    <th>Total Marks</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="form-actions">
+        <a href="index.html" class="btn btn-primary">← Home Page</a>
+        <a href="insert.html" class="btn">＋ Add Student</a>
+    </div>
+
+</main>
+
+<footer class="site-footer">
+    Student Management System | School Database Project
+</footer>
+
+<script>
+loadStudents();
+
+function loadStudents() {
+    fetch("/student")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Unable to load students");
+            }
+            return response.json();
+        })
+        .then(data => {
+            let table = document.getElementById("studentTable");
+
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Student Number</th>
+                        <th>Student Name</th>
+                        <th>Total Marks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(student => `
+                        <tr>
+                            <td>${student.sno}</td>
+                            <td>${student.name}</td>
+                            <td>${student.total}</td>
+                        </tr>
+                    `).join("")}
+                </tbody>
+            `;
+        })
+        .catch(error => alert(error.message));
+}
+</script>
+
+</body>
+</html>

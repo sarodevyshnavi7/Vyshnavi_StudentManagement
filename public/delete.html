@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Student</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="brand">
+        <div class="brand-icon">🎓</div>
+        <div>
+            <h1>Student Management</h1>
+            <p>School Records Management Portal</p>
+        </div>
+    </div>
+</header>
+
+<nav class="navbar">
+    <a href="index.html">⌂ Home</a>
+    <a href="list.html">☷ List Students</a>
+    <a href="listOne.html">⌕ Search Student</a>
+    <a href="insert.html">＋ Insert Student</a>
+    <a href="update.html">✎ Update Student</a>
+    <a href="delete.html" class="active">▤ Delete Student</a>
+</nav>
+
+<main class="container">
+
+    <div class="page-heading">
+        <h2>🗑️ Delete Student</h2>
+        <p>Select the student record you want to remove.</p>
+    </div>
+
+    <img src="images/delete.png"
+         alt="Delete Student with red cross"
+         class="page-image">
+
+    <section class="panel">
+        <form id="deleteForm">
+
+            <div class="form-group">
+                <label for="sno">Select Student to Delete</label>
+                <select id="sno" required>
+                    <option value="">-- Select Student --</option>
+                </select>
+                <span class="form-help">
+                    Verify the student number before deleting.
+                </span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">
+                    ❌ Delete Student
+                </button>
+                <a href="index.html" class="btn btn-outline">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+    </section>
+
+    <div class="info-note">
+        Warning: Deleting a student removes the record from the database.
+    </div>
+
+</main>
+
+<footer class="site-footer">
+    Student Management System | School Database Project
+</footer>
+
+<script>
+loadStudents();
+
+function loadStudents() {
+    fetch("/student")
+        .then(response => {
+            if (!response.ok) throw new Error("Unable to load students");
+            return response.json();
+        })
+        .then(data => {
+            const dropdown = document.getElementById("sno");
+
+            data.forEach(student => {
+                const option = document.createElement("option");
+                option.value = student.sno;
+                option.textContent = student.sno + " - " + student.name;
+                dropdown.appendChild(option);
+            });
+        })
+        .catch(error => alert(error.message));
+}
+
+document.getElementById("deleteForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const sno = document.getElementById("sno").value;
+
+    if (!sno) {
+        alert("Please select a student");
+        return;
+    }
+
+    const selectedText =
+        document.getElementById("sno").selectedOptions[0].textContent;
+
+    if (!confirm("Are you sure you want to delete " + selectedText + "?")) {
+        return;
+    }
+
+    fetch("/student/" + encodeURIComponent(sno), {
+        method: "DELETE"
+    })
+    .then(response => response.text().then(message => {
+        if (!response.ok) throw new Error(message);
+        return message;
+    }))
+    .then(message => {
+        alert(message);
+        location.href = "list.html";
+    })
+    .catch(error => alert(error.message));
+});
+</script>
+
+</body>
+</html>
